@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { SalesController } from './sales.controller';
 import { SalesService } from './sales.service';
 import { SalesData } from './sales.entity';
+import { AppService } from 'src/app.service';
 
 @Module({
   imports: [
@@ -11,6 +12,6 @@ import { SalesData } from './sales.entity';
     TypeOrmModule.forFeature([SalesData]), // Add entities if required
   ],
   controllers: [SalesController],
-  providers: [SalesService],
+  providers: [SalesService,AppService],
 })
 export class SalesModule {}
