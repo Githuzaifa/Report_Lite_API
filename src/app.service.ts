@@ -29,11 +29,6 @@ export class AppService {
         );
       `;
 
-      await queryRunner.query(`TRUNCATE TABLE "${tableName}"`)
-
-
-    
-  
     console.log("Executing:", createTableQuery);
     await queryRunner.query(createTableQuery);
   

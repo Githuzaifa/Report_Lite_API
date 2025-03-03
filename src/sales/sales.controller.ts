@@ -1,18 +1,30 @@
-import { Controller, Post, Body, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query } from '@nestjs/common';
 import { AppService } from 'src/app.service';
+import { SalesService } from './sales.service';
 
-@Controller('upload')
+@Controller() // No prefix for root-level routes
 export class SalesController {
-  constructor(private readonly appService: AppService) {}
+  constructor(
+    private readonly appService: AppService,
+    private readonly salesService: SalesService,
+  ) {}
 
-  @Post('sales-data')
+  @Post('upload/sales-data') // POST /upload/sales-data
   async uploadSalesData(
-    @Query('tableName') tableName: string, 
-    @Body() salesData: object[]
+    @Query('tableName') tableName: string,
+    @Body() salesData: object[],
   ) {
     if (!tableName || !salesData) {
       throw new Error('tableName and salesData are required!');
     }
     return this.appService.createDynamicTable(tableName, salesData);
+  }
+
+  @Get('get_sales-data') // GET /get_sales-data
+  async getSalesData(@Query('tableName') tableName: string) {
+    if (!tableName) {
+      throw new Error('tableName is required!');
+    }
+    return this.salesService.getSalesData(tableName);
   }
 }
