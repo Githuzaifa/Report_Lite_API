@@ -5,6 +5,9 @@ import { DataSource } from 'typeorm';
 export class AppService {
   constructor(private readonly dataSource: DataSource) {}
 
+  getHello(): string {
+    return 'Report Lite';
+  }
   async createDynamicTable(tableName: string, jsonData: any[]) {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
