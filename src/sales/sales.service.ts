@@ -11,7 +11,7 @@ export class SalesService {
     
         try {
             // Query to fetch the last record from the table
-            const selectQuery = `SELECT * FROM "${tableName}" WHERE id=(SELECT max(id) FROM TableName);`;
+            const selectQuery = `SELECT * FROM ${tableName} WHERE id=(SELECT max(id) FROM TableName);`;
             const result = await queryRunner.query(selectQuery);
     
             // If no records are found, return an empty array
