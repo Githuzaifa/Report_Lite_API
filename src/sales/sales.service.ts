@@ -5,30 +5,40 @@ import { DataSource } from 'typeorm';
 export class SalesService {
     constructor(private readonly dataSource: DataSource) {}
 
-    async getSalesData(tableName: string): Promise<any[]> {
+    async deleteSalesData(tableName: string): Promise<number> {
         const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();
     
         try {
-            // Query to fetch the last record from the table
-            const selectQuery = `SELECT * FROM "${tableName}" WHERE id=(SELECT max(id) FROM "${tableName}");`;
-            const result = await queryRunner.query(selectQuery);
-    
-            // If no records are found, return an empty array
-            if (result.length === 0) {
-                return [];
-            }
-    
-            // Return the last record directly
-            return [result[0]];
+            // Query to count the total number of records
+            queryRunner.query(`TRUNCATE TABLE "${tableName}"`);
+
         } catch (error) {
-            // Handle any errors by returning an empty array
-            console.error(`Error fetching data: ${error.message}`);
-            return [];
+            console.error(`Error removing record count: ${error.message}`);
+            return 0; // Return 0 in case of any errors
         } finally {
-            // Release the query runner
+            await queryRunner.release();
+        }
+        return 0;
+    }
+    async getSalesData(tableName: string): Promise<number> {
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+    
+        try {
+            // Query to count the total number of records
+            const countQuery = `SELECT COUNT(*) AS total FROM "${tableName}";`;
+            const result = await queryRunner.query(countQuery);
+    
+            // Return the count (ensure it's properly parsed as a number)
+            return result[0]?.total ? parseInt(result[0].total, 10) : 0;
+        } catch (error) {
+            console.error(`Error fetching record count: ${error.message}`);
+            return 0; // Return 0 in case of any errors
+        } finally {
             await queryRunner.release();
         }
     }
+    
 
 }

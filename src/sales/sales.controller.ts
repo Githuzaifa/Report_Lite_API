@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, Delete } from '@nestjs/common';
 import { AppService } from 'src/app.service';
 import { SalesService } from './sales.service';
 
@@ -27,4 +27,12 @@ export class SalesController {
     }
     return this.salesService.getSalesData(tableName);
   }
+
+  @Delete('delete')
+    async deleteTable(@Query('tableName') tableName: string){
+      if (!tableName) {
+        throw new Error('tableName is required!');
+      }
+      return this.salesService.deleteSalesData(tableName);
+    }
 }
