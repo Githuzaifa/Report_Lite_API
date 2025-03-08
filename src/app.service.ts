@@ -42,26 +42,26 @@ export class AppService {
         const valueSets: string[] = [];
         const parameters = [];
 
-        // Build parameters and placeholders
-        for (const row of batch) {
-          const rowValues: string[] = []; // Explicitly define the type as string[]
-            for (const value of Object.values(row)) {
-                if (value === null || value === undefined) {
-                    rowValues.push('NULL');
-                } else if (typeof value === 'boolean') {
-                    rowValues.push(value ? 'true' : 'false');
-                } else if (typeof value === 'number') {
-                    rowValues.push(value.toString());
-                } else {
-                    // Escape single quotes and handle date formatting
-                    const escapedValue = String(value)
-                        .replace(/'/g, "''")
-                        .replace(/T(\d{2}:\d{2}:\d{2})/, ' $1');
-                    rowValues.push(`'${escapedValue}'`);
-                }
-            }
-            valueSets.push(`(${rowValues.join(', ')})`);
-        }
+        const values = batch
+    .map(row => `(${Object.values(row).map(value => `'${value}'`).join(", ")})`)
+    .join(", ");
+
+    for (const row of batch) {
+      const rowValues: string[] = Object.values(row).map(value => {
+          if (value == null) return 'NULL'; // Covers both null & undefined
+          if (typeof value === 'boolean') return value ? 'true' : 'false';
+          if (typeof value === 'number') return value.toString();
+          
+          let strValue = String(value);
+          if (strValue.includes("'")) strValue = strValue.replace(/'/g, "''"); // Escape single quotes
+          if (strValue.includes("T")) strValue = strValue.replace(/T(\d{2}:\d{2}:\d{2})/, ' $1'); // Format date-time
+          
+          return `'${strValue}'`;
+      });
+  
+      valueSets.push(`(${rowValues.join(', ')})`);
+  }
+  
 
         // Build final insert query
         const insertQuery = `
