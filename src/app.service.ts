@@ -64,17 +64,10 @@ export class AppService {
   
 
         // Build final insert query
-        const columnsWithoutId = columnsList.split(', ').filter(col => col !== '"id"').join(', ');
-
-const insertQuery = `
-    INSERT INTO "${tableName}" (${columnsList})
-    SELECT * FROM (VALUES ${valueSets.join(', ')}) AS new_data (${columnsList})
-    WHERE NOT EXISTS (
-        SELECT 1 FROM "${tableName}" 
-        WHERE ${columnsWithoutId.split(', ').map(col => `"${tableName}".${col} = new_data.${col}`).join(' AND ')}
-    );
-`;
-
+        const insertQuery = `
+            INSERT INTO "${tableName}" (${columnsList})
+            VALUES ${valueSets.join(', ')}
+        `;
 
         await queryRunner.query(insertQuery);
     }
